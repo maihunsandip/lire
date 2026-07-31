@@ -10,6 +10,8 @@ import '../widgets/library_header.dart';
 import 'package:lire/core/widgets/app_error_view.dart';
 import 'package:lire/core/widgets/app_loading_indicator.dart';
 
+import '../widgets/book_tile.dart';
+
 import 'package:lire/features/import/presentation/controllers/import_controller.dart';
 
 class LibraryPage extends ConsumerWidget {
@@ -37,7 +39,14 @@ class LibraryPage extends ConsumerWidget {
                 Expanded(
                   child: books.isEmpty
                       ? const EmptyLibrary()
-                      : const Center(child: Text('Books will appear here')),
+                      : ListView.separated(
+                          itemCount: books.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            return BookTile(book: books[index]);
+                          },
+                        ),
                 ),
               ],
             ),
