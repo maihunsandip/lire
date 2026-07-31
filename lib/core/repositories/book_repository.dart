@@ -1,7 +1,7 @@
 import '../models/book.dart';
 
 abstract interface class BookRepository {
-  Future<List<Book>> getBooks();
+  Stream<List<Book>> watchBooks();
 
   Future<Book?> getBook(String id);
 

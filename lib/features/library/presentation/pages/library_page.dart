@@ -10,6 +10,8 @@ import '../widgets/library_header.dart';
 import 'package:lire/core/widgets/app_error_view.dart';
 import 'package:lire/core/widgets/app_loading_indicator.dart';
 
+import 'package:lire/features/import/presentation/controllers/import_controller.dart';
+
 class LibraryPage extends ConsumerWidget {
   const LibraryPage({super.key});
 
@@ -18,7 +20,11 @@ class LibraryPage extends ConsumerWidget {
     final booksAsync = ref.watch(libraryProvider);
 
     return Scaffold(
-      appBar: const LibraryAppBar(),
+      appBar: LibraryAppBar(
+        onImport: () async {
+          await ref.read(importControllerProvider).importBooks();
+        },
+      ),
       body: booksAsync.when(
         data: (books) {
           return Padding(

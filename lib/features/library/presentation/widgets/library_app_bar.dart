@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 class LibraryAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  const LibraryAppBar({super.key});
+  const LibraryAppBar({
+    super.key,
+    required this.onImport,
+  });
+
+  final VoidCallback onImport;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -29,7 +34,7 @@ class LibraryAppBar extends StatelessWidget
         ),
         IconButton(
           tooltip: 'Import Books',
-          onPressed: () {},
+          onPressed: onImport,
           icon: const Icon(Icons.file_upload_outlined),
         ),
       ],

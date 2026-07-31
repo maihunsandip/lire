@@ -1,34 +1,53 @@
+import 'package:lire/core/database/daos/books_dao.dart';
 import 'package:lire/core/models/book.dart';
 import 'package:lire/core/repositories/book_repository.dart';
 
+import '../mappers/book_mapper.dart';
+
 class LocalBookRepository implements BookRepository {
-  @override
-  Future<void> addBook(Book book) async {
-    throw UnimplementedError();
-  }
+  final BooksDao dao;
+
+  LocalBookRepository(this.dao);
 
   @override
-  Future<void> clearLibrary() async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteBook(String id) async {
-    throw UnimplementedError();
+  Stream<List<Book>> watchBooks() {
+    return dao.watchBooks().map(
+      (rows) => rows.map(BookMapper.fromDatabase).toList(),
+    );
   }
 
   @override
   Future<Book?> getBook(String id) async {
-    throw UnimplementedError();
+    final row = await dao.getBook(id);
+
+    if (row == null) {
+      return null;
+    }
+
+    return BookMapper.fromDatabase(row);
   }
 
   @override
-  Future<List<Book>> getBooks() async {
-    return [];
+  Future<void> addBook(Book book) async {
+    await dao.insertBook(
+      BookMapper.toCompanion(book),
+    );
   }
 
   @override
   Future<void> updateBook(Book book) async {
-    throw UnimplementedError();
+    throw UnimplementedError(
+      'updateBook() will be implemented after import is working.',
+    );
+  }
+
+  @override
+  Future<void> deleteBook(String id) async {
+    await dao.deleteBook(id);
+  }
+
+  @override
+  Future<void> clearLibrary() async {
+    await dao.clearLibrary();
   }
 }
