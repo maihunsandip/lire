@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lire/app/router.dart';
+
+import 'router.dart';
+import 'theme/app_theme.dart';
 
 class LireApp extends StatelessWidget {
   const LireApp({super.key});
@@ -9,11 +11,13 @@ class LireApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Lire',
       debugShowCheckedModeBanner: false,
+
       routerConfig: appRouter,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.deepPurple,
-      ),
+
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+
+      themeMode: ThemeMode.system,
     );
   }
 }
