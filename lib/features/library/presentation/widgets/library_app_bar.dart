@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lire/core/providers/layout_provider.dart';
+import 'package:lire/core/providers/search_provider.dart';
 
-class LibraryAppBar extends ConsumerWidget
+class LibraryAppBar extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
   const LibraryAppBar({
     super.key,
@@ -16,16 +17,60 @@ class LibraryAppBar extends ConsumerWidget
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LibraryAppBar> createState() => _LibraryAppBarState();
+}
+
+class _LibraryAppBarState extends ConsumerState<LibraryAppBar> {
+  bool _searching = false;
+
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final layout = ref.watch(layoutProvider);
 
     return AppBar(
-      title: const Text('Lire'),
+      title: _searching
+          ? TextField(
+              controller: _controller,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search books...',
+                border: InputBorder.none,
+              ),
+              onChanged: (value) {
+                ref.read(searchQueryProvider.notifier).state = value;
+              },
+            )
+          : const Text('Lire'),
       actions: [
         IconButton(
-          tooltip: 'Search',
-          onPressed: () {},
-          icon: const Icon(Icons.search),
+          tooltip: _searching ? 'Close Search' : 'Search',
+          icon: Icon(
+            _searching ? Icons.close : Icons.search,
+          ),
+          onPressed: () {
+            if (_searching) {
+              _controller.clear();
+              ref.read(searchQueryProvider.notifier).state = '';
+            }
+
+            setState(() {
+              _searching = !_searching;
+            });
+          },
         ),
         IconButton(
           tooltip: 'Sort',
@@ -47,7 +92,7 @@ class LibraryAppBar extends ConsumerWidget
         ),
         IconButton(
           tooltip: 'Import Books',
-          onPressed: onImport,
+          onPressed: widget.onImport,
           icon: const Icon(Icons.file_upload_outlined),
         ),
       ],

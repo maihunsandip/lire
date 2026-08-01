@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lire/core/providers/layout_provider.dart';
-import 'package:lire/core/providers/library_provider.dart';
+// import 'package:lire/core/providers/library_provider.dart';
+import 'package:lire/core/providers/filtered_books_provider.dart';
 import 'package:lire/core/widgets/app_error_view.dart';
 import 'package:lire/core/widgets/app_loading_indicator.dart';
 import 'package:lire/features/import/presentation/controllers/import_controller.dart';
+
 
 import '../widgets/book_grid.dart';
 import '../widgets/book_list.dart';
@@ -18,7 +20,7 @@ class LibraryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final booksAsync = ref.watch(libraryProvider);
+    final booksAsync = ref.watch(filteredBooksProvider);
     final layout = ref.watch(layoutProvider);
 
     return Scaffold(
