@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
-import 'package:lire/core/enums/book_format.dart';
 import 'package:lire/core/models/book.dart';
 import 'package:lire/core/providers/repository_provider.dart';
 import 'package:lire/core/repositories/book_repository.dart';
 import 'package:lire/features/import/services/import_service.dart';
+import 'package:lire/features/import/domain/metadata/book_metadata.dart';
+import 'package:lire/features/import/domain/metadata/metadata_extractor_factory.dart';
 
 final importServiceProvider = Provider<ImportService>(
   (ref) => const ImportService(),
@@ -22,10 +22,7 @@ final importControllerProvider = Provider<ImportController>(
 );
 
 class ImportController {
-  ImportController({
-    required this.repository,
-    required this.importService,
-  });
+  ImportController({required this.repository, required this.importService});
 
   final BookRepository repository;
   final ImportService importService;
@@ -36,27 +33,23 @@ class ImportController {
     final files = await importService.pickBooks();
 
     for (final file in files) {
-      await repository.addBook(
-        _createBook(file),
-      );
+      final book = await _createBook(file);
+      await repository.addBook(book);
     }
   }
 
-  Book _createBook(File file) {
-    final extension = p.extension(file.path).toLowerCase();
+  Future<Book> _createBook(File file) async {
+    final extractor = MetadataExtractorFactory.forFile(file.path);
 
-    final format = BookFormat.values.firstWhere(
-      (e) => e.name == extension.replaceFirst('.', ''),
-      orElse: () => BookFormat.txt,
-    );
+    final BookMetadata metadata = await extractor.extract(file.path);
 
     return Book(
       id: _uuid.v4(),
-      title: p.basenameWithoutExtension(file.path),
-      author: 'Unknown',
+      title: metadata.title,
+      author: metadata.author,
       path: file.path,
-      format: format,
-      coverPath: null,
+      format: metadata.format,
+      coverPath: metadata.coverPath,
       dateAdded: DateTime.now(),
       lastOpened: null,
       readingProgress: 0,
