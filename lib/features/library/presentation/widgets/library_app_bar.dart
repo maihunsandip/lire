@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LibraryAppBar extends StatelessWidget
+import 'package:lire/core/providers/layout_provider.dart';
+
+class LibraryAppBar extends ConsumerWidget
     implements PreferredSizeWidget {
   const LibraryAppBar({
     super.key,
@@ -13,7 +16,9 @@ class LibraryAppBar extends StatelessWidget
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final layout = ref.watch(layoutProvider);
+
     return AppBar(
       title: const Text('Lire'),
       actions: [
@@ -28,9 +33,17 @@ class LibraryAppBar extends StatelessWidget
           icon: const Icon(Icons.sort),
         ),
         IconButton(
-          tooltip: 'Grid/List View',
-          onPressed: () {},
-          icon: const Icon(Icons.grid_view_rounded),
+          tooltip: layout == LibraryLayout.grid
+              ? 'List View'
+              : 'Grid View',
+          onPressed: () {
+            ref.read(layoutProvider.notifier).toggle();
+          },
+          icon: Icon(
+            layout == LibraryLayout.grid
+                ? Icons.view_list_rounded
+                : Icons.grid_view_rounded,
+          ),
         ),
         IconButton(
           tooltip: 'Import Books',

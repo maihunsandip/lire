@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lire/core/providers/layout_provider.dart';
 import 'package:lire/core/providers/library_provider.dart';
+import 'package:lire/core/widgets/app_error_view.dart';
+import 'package:lire/core/widgets/app_loading_indicator.dart';
+import 'package:lire/features/import/presentation/controllers/import_controller.dart';
 
+import '../widgets/book_grid.dart';
+import '../widgets/book_list.dart';
 import '../widgets/empty_library.dart';
 import '../widgets/library_app_bar.dart';
 import '../widgets/library_header.dart';
-
-import 'package:lire/core/widgets/app_error_view.dart';
-import 'package:lire/core/widgets/app_loading_indicator.dart';
-
-import '../widgets/book_tile.dart';
-
-import 'package:lire/features/import/presentation/controllers/import_controller.dart';
 
 class LibraryPage extends ConsumerWidget {
   const LibraryPage({super.key});
@@ -20,6 +19,7 @@ class LibraryPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final booksAsync = ref.watch(libraryProvider);
+    final layout = ref.watch(layoutProvider);
 
     return Scaffold(
       appBar: LibraryAppBar(
@@ -39,14 +39,13 @@ class LibraryPage extends ConsumerWidget {
                 Expanded(
                   child: books.isEmpty
                       ? const EmptyLibrary()
-                      : ListView.separated(
-                          itemCount: books.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            return BookTile(book: books[index]);
-                          },
-                        ),
+                      : layout == LibraryLayout.list
+                          ? BookList(
+                              books: books,
+                            )
+                          : BookGrid(
+                              books: books,
+                            ),
                 ),
               ],
             ),
